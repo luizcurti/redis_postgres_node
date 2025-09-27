@@ -4,17 +4,32 @@ import router from "./routes";
 
 const app = express();
 app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'Server is running!' });
+});
+
 app.use(router);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.NODE_ENV === 'test' ? 0 : process.env.PORT || 3000;
 
-async function startServer() {
+export async function startServer() {
   try {
-    app.listen(PORT, () => console.log(`Server is running on PORT ${PORT}`));
+    const server = app.listen(PORT, () => {
+      if (process.env.NODE_ENV !== 'test') {
+        const address = server.address();
+        const port = typeof address === 'string' ? address : address?.port;
+        console.log(`Server is running on PORT ${port}`);
+      }
+    });
+    return server;
   } catch (err) {
-    console.error("Failed to connect to database:", err);
-    process.exit(1); 
+    throw err;
   }
 }
 
-startServer();
+if (process.env.NODE_ENV !== 'test') {
+  startServer();
+}
+
+export default app;

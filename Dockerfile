@@ -1,12 +1,14 @@
-FROM node:22
+FROM node:20
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+
+RUN npm ci
+RUN npm install -g ts-node typescript
 
 COPY . .
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["ts-node", "src/server.ts"]

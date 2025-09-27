@@ -33,7 +33,6 @@ export class CreateUserController {
 
       return response.status(201).json({ message: "User created successfully", userId: id });
     } catch (error) {
-      console.error("Error creating user:", error);
       return response.status(500).json({ error: "Internal server error" });
     } finally {
       await clientConnection.end();

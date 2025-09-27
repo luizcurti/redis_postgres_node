@@ -62,7 +62,6 @@ export class LoginUserController {
         user: userData,
       });
     } catch (error) {
-      console.error("Login error:", error);
       return response.status(500).json({ error: "Internal server error." });
     } finally {
       await clientConnection.end();
