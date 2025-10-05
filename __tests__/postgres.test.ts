@@ -1,5 +1,4 @@
 import { createConnection } from '../src/postgres';
-import { Pool } from 'pg';
 
 jest.mock('pg');
 

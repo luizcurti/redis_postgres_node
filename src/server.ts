@@ -13,19 +13,15 @@ app.use(router);
 
 const PORT = process.env.NODE_ENV === 'test' ? 0 : process.env.PORT || 3000;
 
-export async function startServer() {
-  try {
-    const server = app.listen(PORT, () => {
-      if (process.env.NODE_ENV !== 'test') {
-        const address = server.address();
-        const port = typeof address === 'string' ? address : address?.port;
-        console.log(`Server is running on PORT ${port}`);
-      }
-    });
-    return server;
-  } catch (err) {
-    throw err;
-  }
+export async function startServer(): Promise<ReturnType<typeof app.listen>> {
+  const server = app.listen(PORT, () => {
+    if (process.env.NODE_ENV !== 'test') {
+      const address = server.address();
+      const port = typeof address === 'string' ? address : address?.port;
+      console.log(`Server is running on PORT ${port}`);
+    }
+  });
+  return server;
 }
 
 if (process.env.NODE_ENV !== 'test') {

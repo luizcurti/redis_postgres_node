@@ -1,7 +1,7 @@
 import { LoginUserController } from '../src/controllers/LoginUserController';
 import { Request, Response } from 'express';
 import { createConnection } from '../src/postgres';
-import { getRedis, setRedis } from '../src/redisConfig';
+import { setRedis } from '../src/redisConfig';
 import { Pool } from 'pg';
 import { sign } from 'jsonwebtoken';
 import { compare } from 'bcryptjs';
@@ -35,7 +35,7 @@ jest.mock('../src/redisConfig', () => ({
 }));
 
 jest.mock('jsonwebtoken', () => ({
-  sign: jest.fn((payload, secret, options) => {
+  sign: jest.fn((payload, secret) => {
     if (!secret) throw new Error('JWT_SECRET is required');
     return 'mockToken';
   }),

@@ -1,8 +1,6 @@
 import { CreateUserController } from '../src/controllers/CreateUserController';
 import { Request, Response } from 'express';
 import { createConnection } from '../src/postgres';
-import { v4 as uuid } from 'uuid';
-import { hash } from 'bcryptjs';
 
 jest.mock('../src/postgres', () => ({
   createConnection: jest.fn(() => ({
@@ -23,7 +21,10 @@ describe('CreateUserController', () => {
   let req: Partial<Request>;
   let res: Partial<Response>;
   let controller: CreateUserController;
-  let mockConnection: any;
+  let mockConnection: {
+    query: jest.Mock;
+    end: jest.Mock;
+  };
 
   beforeEach(() => {
     req = { body: {} };

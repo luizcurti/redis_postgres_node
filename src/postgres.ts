@@ -8,7 +8,7 @@ const pool = new Pool({
   database: process.env.DB_DATABASE,
 });
 
-export async function createConnection() {
+export async function createConnection(): Promise<Pool> {
   return pool;
 }
 

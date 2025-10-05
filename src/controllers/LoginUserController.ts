@@ -13,7 +13,7 @@ type User = {
 };
 
 export class LoginUserController {
-  async handle(request: Request, response: Response) {
+  async handle(request: Request, response: Response): Promise<Response> {
     const { username, password } = request.body;
 
     if (!username || !password) {
@@ -63,7 +63,7 @@ export class LoginUserController {
         token,
         user: userData,
       });
-    } catch (error) {
+    } catch {
       return response.status(500).json({ error: 'Internal server error.' });
     } finally {
       await clientConnection.end();

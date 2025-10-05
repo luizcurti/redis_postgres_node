@@ -7,14 +7,14 @@ export function authentication(
   request: Request,
   response: Response,
   next: NextFunction
-) {
+): Response | void {
   const authHeader = request.headers.authorization;
 
   if (!authHeader) {
     return response.status(401).json({ error: 'Token missing' });
   }
 
-  const [, token] = authHeader.split(' ');
+  const [,] = authHeader.split(' ');
 
   try {
     const token = sign({ sub: 'userId' }, 'secret_word_here', {
@@ -26,7 +26,7 @@ export function authentication(
     (request as Request & { userId: string }).userId = decoded.sub;
 
     return next();
-  } catch (err) {
+  } catch {
     return response.status(401).json({ error: 'Invalid token' });
   }
 }
@@ -35,7 +35,7 @@ export function authMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
-) {
+): Response | void {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
@@ -47,7 +47,7 @@ export function authMiddleware(
   try {
     verify(token, 'secret');
     next();
-  } catch (err) {
+  } catch {
     return res.status(401).json({ error: 'Invalid token' });
   }
 }

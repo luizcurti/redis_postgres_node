@@ -1,9 +1,6 @@
 import request from 'supertest';
 import app from '../src/server';
 import { createConnection } from '../src/postgres';
-import { sign } from 'jsonwebtoken';
-import { setRedis, getRedis } from '../src/redisConfig';
-import { hash } from 'bcryptjs';
 
 jest.mock('../src/postgres', () => ({
   createConnection: jest.fn(),
@@ -50,7 +47,7 @@ describe('Routes Endpoints', () => {
       end: jest.fn(),
     };
 
-    const loginQueryMock = jest.fn((sql, params) => {
+    const loginQueryMock = jest.fn(sql => {
       if (
         sql
           .toLowerCase()
@@ -82,7 +79,7 @@ describe('Routes Endpoints', () => {
       return Promise.resolve({ rows: [] });
     });
 
-    const createUserQueryMock = jest.fn((sql, params) => {
+    const createUserQueryMock = jest.fn(() => {
       return Promise.resolve({ rows: [{ id: '123' }] });
     });
 
@@ -112,7 +109,7 @@ describe('Routes Endpoints', () => {
       }
 
       if (sqlLower.includes('insert into users')) {
-        return createUserQueryMock(sql, params);
+        return createUserQueryMock();
       }
 
       if (
@@ -121,7 +118,7 @@ describe('Routes Endpoints', () => {
         )
       ) {
         if (params?.[0] === 'testuser') {
-          return loginQueryMock(sql, params);
+          return loginQueryMock(sql);
         }
         return Promise.resolve({ rows: [] });
       }
@@ -133,7 +130,7 @@ describe('Routes Endpoints', () => {
       return Promise.resolve({ rows: [] });
     });
 
-    jest.mocked(createConnection).mockResolvedValue(mockPool as any);
+    jest.mocked(createConnection).mockResolvedValue(mockPool as never);
   });
   describe('POST /users', () => {
     it('should create a new user', async () => {

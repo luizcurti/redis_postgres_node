@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { getRedis } from '../redisConfig';
 
 export class GetUserInfoController {
-  async handle(request: Request, response: Response) {
+  async handle(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
 
     if (!id) {

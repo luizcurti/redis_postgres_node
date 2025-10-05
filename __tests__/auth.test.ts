@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import jwt, { verify, sign } from 'jsonwebtoken';
+import { verify, sign } from 'jsonwebtoken';
 import { authMiddleware, authentication } from '../src/middleware/auth';
 
 jest.mock('jsonwebtoken', () => ({
@@ -33,8 +33,8 @@ describe('Auth Middleware', () => {
       req.headers = { authorization: `Bearer ${mockToken}` };
       const mockDecoded = { sub: 'userId123' };
 
-      jest.mocked(sign).mockReturnValueOnce('newToken' as any);
-      jest.mocked(verify).mockReturnValueOnce(mockDecoded as any);
+      (sign as jest.Mock).mockReturnValueOnce('newToken');
+      (verify as jest.Mock).mockReturnValueOnce(mockDecoded);
 
       authentication(req as Request, res as Response, next);
 
@@ -42,7 +42,7 @@ describe('Auth Middleware', () => {
         expiresIn: '1h',
       });
       expect(verify).toHaveBeenCalledWith('newToken', process.env.JWT_SECRET);
-      expect((req as any).userId).toBe('userId123');
+      expect((req as Request & { userId: string }).userId).toBe('userId123');
       expect(next).toHaveBeenCalled();
     });
 
@@ -89,7 +89,7 @@ describe('Auth Middleware', () => {
       const mockToken = 'valid.token.here';
       req.headers = { authorization: `Bearer ${mockToken}` };
 
-      jest.mocked(verify).mockReturnValueOnce({ sub: 'userId123' } as any);
+      (verify as jest.Mock).mockReturnValueOnce({ sub: 'userId123' });
 
       authMiddleware(req as Request, res as Response, next);
 
