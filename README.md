@@ -44,3 +44,41 @@ After setting everything up, you can start the application with:
 ```bash
 npm run dev
 ```
+
+## 🔧 Development Tools
+
+### ESLint & Prettier
+This project includes ESLint for code linting and Prettier for code formatting to ensure consistent code quality.
+
+Available scripts:
+- `npm run lint` - Run ESLint to check for code issues
+- `npm run lint:fix` - Run ESLint with automatic fixes
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check if code is formatted correctly
+
+### Available Scripts
+- `npm run dev` - Start development server with hot reload
+- `npm start` - Start production server
+- `npm run build` - Compile TypeScript to JavaScript
+- `npm test` - Run all tests
+- `npm run coverage` - Run tests with coverage report
+
+## 🚀 CI/CD Pipeline
+
+This project uses GitHub Actions for continuous integration. The pipeline automatically:
+
+- **Linting**: Runs ESLint to check code quality
+- **Formatting**: Validates Prettier code formatting 
+- **Type Checking**: Runs TypeScript compiler to check types
+- **Testing**: Executes all test suites
+- **Coverage**: Generates test coverage reports
+- **Build**: Compiles the project to ensure it builds successfully
+
+The CI pipeline runs on:
+- Push to `main` or `develop` branches
+- Pull requests to `main` or `develop` branches
+- Node.js versions (20.x)
+
+### Services included in CI:
+- PostgreSQL 13 for database tests
+- Redis Alpine for caching tests

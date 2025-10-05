@@ -11,18 +11,22 @@ jest.mock('bcryptjs', () => ({
 }));
 
 jest.mock('../src/postgres', () => ({
-  createConnection: jest.fn(() => Promise.resolve({
-    query: jest.fn().mockResolvedValue({
-      rows: [{
-        id: '123',
-        name: 'John Doe',
-        username: 'test',
-        password: 'hashedpassword',
-        email: 'test@example.com',
-      }],
-    }),
-    end: jest.fn(),
-  } as unknown as Pool)),
+  createConnection: jest.fn(() =>
+    Promise.resolve({
+      query: jest.fn().mockResolvedValue({
+        rows: [
+          {
+            id: '123',
+            name: 'John Doe',
+            username: 'test',
+            password: 'hashedpassword',
+            email: 'test@example.com',
+          },
+        ],
+      }),
+      end: jest.fn(),
+    } as unknown as Pool)
+  ),
 }));
 
 jest.mock('../src/redisConfig', () => ({
@@ -57,13 +61,19 @@ describe('LoginUserController', () => {
     await controller.handle(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: 'Username and password are required.' });
+    expect(res.json).toHaveBeenCalledWith({
+      error: 'Username and password are required.',
+    });
   });
 
   it('should return 404 if user is not found', async () => {
     req = { body: { username: 'nonexistent', password: 'testpass' } };
     const mockQuery = jest.fn().mockResolvedValueOnce({ rows: [] });
-    jest.mocked(createConnection).mockReturnValueOnce(Promise.resolve({ query: mockQuery, end: jest.fn() } as unknown as Pool));
+    jest
+      .mocked(createConnection)
+      .mockReturnValueOnce(
+        Promise.resolve({ query: mockQuery, end: jest.fn() } as unknown as Pool)
+      );
 
     await controller.handle(req as Request, res as Response);
 
@@ -117,8 +127,14 @@ describe('LoginUserController', () => {
 
   it('should handle database errors gracefully', async () => {
     req = { body: { username: 'test', password: 'testpass' } };
-    const mockQuery = jest.fn().mockRejectedValueOnce(new Error('Database error'));
-    jest.mocked(createConnection).mockReturnValueOnce(Promise.resolve({ query: mockQuery, end: jest.fn() } as unknown as Pool));
+    const mockQuery = jest
+      .fn()
+      .mockRejectedValueOnce(new Error('Database error'));
+    jest
+      .mocked(createConnection)
+      .mockReturnValueOnce(
+        Promise.resolve({ query: mockQuery, end: jest.fn() } as unknown as Pool)
+      );
 
     await controller.handle(req as Request, res as Response);
 

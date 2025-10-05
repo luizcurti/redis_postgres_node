@@ -1,8 +1,8 @@
-import { compare } from "bcryptjs";
-import { Request, Response } from "express";
-import { sign } from "jsonwebtoken";
-import { createConnection } from "../postgres";
-import { setRedis } from "../redisConfig";
+import { compare } from 'bcryptjs';
+import { Request, Response } from 'express';
+import { sign } from 'jsonwebtoken';
+import { createConnection } from '../postgres';
+import { setRedis } from '../redisConfig';
 
 type User = {
   id: string;
@@ -17,7 +17,9 @@ export class LoginUserController {
     const { username, password } = request.body;
 
     if (!username || !password) {
-      return response.status(400).json({ error: "Username and password are required." });
+      return response
+        .status(400)
+        .json({ error: 'Username and password are required.' });
     }
 
     const clientConnection = await createConnection();
@@ -31,20 +33,20 @@ export class LoginUserController {
       const user = rows[0];
 
       if (!user) {
-        return response.status(401).json({ error: "Invalid credentials." });
+        return response.status(401).json({ error: 'Invalid credentials.' });
       }
 
       const passwordMatch = await compare(password, user.password);
 
       if (!passwordMatch) {
-        return response.status(401).json({ error: "Invalid credentials." });
+        return response.status(401).json({ error: 'Invalid credentials.' });
       }
 
       delete user.password;
 
       const token = sign({}, process.env.JWT_SECRET as string, {
         subject: user.id,
-        expiresIn: "1h",
+        expiresIn: '1h',
       });
 
       const userData = {
@@ -57,12 +59,12 @@ export class LoginUserController {
       await setRedis(`user-${user.id}`, JSON.stringify(userData));
 
       return response.status(200).json({
-        message: "Login successful",
+        message: 'Login successful',
         token,
         user: userData,
       });
     } catch (error) {
-      return response.status(500).json({ error: "Internal server error." });
+      return response.status(500).json({ error: 'Internal server error.' });
     } finally {
       await clientConnection.end();
     }

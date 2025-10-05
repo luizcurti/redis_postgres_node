@@ -43,6 +43,8 @@ describe('redisConfig', () => {
     const mockSet = jest.fn().mockRejectedValue(new Error('Redis error'));
     redisClient.set = mockSet;
 
-    await expect(setRedis('mockKey', 'mockValue')).rejects.toThrow('Redis error');
+    await expect(setRedis('mockKey', 'mockValue')).rejects.toThrow(
+      'Redis error'
+    );
   });
 });

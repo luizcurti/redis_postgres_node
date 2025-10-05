@@ -45,7 +45,9 @@ describe('CreateUserController', () => {
     await controller.handle(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: 'Missing required fields.' });
+    expect(res.json).toHaveBeenCalledWith({
+      error: 'Missing required fields.',
+    });
   });
 
   it('should return 409 if username already exists', async () => {
@@ -82,7 +84,10 @@ describe('CreateUserController', () => {
       ['mocked-uuid', 'Test User', 'newuser', 'mocked-hash', 'test@example.com']
     );
     expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.json).toHaveBeenCalledWith({ message: 'User created successfully', userId: 'mocked-uuid' });
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'User created successfully',
+      userId: 'mocked-uuid',
+    });
   });
 
   it('should return 500 if an error occurs', async () => {

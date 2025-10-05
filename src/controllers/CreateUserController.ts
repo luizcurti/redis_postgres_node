@@ -1,14 +1,14 @@
-import { hash } from "bcryptjs";
-import { Request, Response } from "express";
-import { v4 as uuid } from "uuid";
-import { createConnection } from "../postgres";
+import { hash } from 'bcryptjs';
+import { Request, Response } from 'express';
+import { v4 as uuid } from 'uuid';
+import { createConnection } from '../postgres';
 
 export class CreateUserController {
   async handle(request: Request, response: Response) {
     const { username, name, password, email } = request.body;
 
     if (!username || !name || !password || !email) {
-      return response.status(400).json({ error: "Missing required fields." });
+      return response.status(400).json({ error: 'Missing required fields.' });
     }
 
     const clientConnection = await createConnection();
@@ -20,7 +20,7 @@ export class CreateUserController {
       );
 
       if (rows.length > 0) {
-        return response.status(409).json({ error: "Username already taken." });
+        return response.status(409).json({ error: 'Username already taken.' });
       }
 
       const passwordHash = await hash(password, 8);
@@ -31,9 +31,11 @@ export class CreateUserController {
         [id, name, username, passwordHash, email]
       );
 
-      return response.status(201).json({ message: "User created successfully", userId: id });
+      return response
+        .status(201)
+        .json({ message: 'User created successfully', userId: id });
     } catch (error) {
-      return response.status(500).json({ error: "Internal server error" });
+      return response.status(500).json({ error: 'Internal server error' });
     } finally {
       await clientConnection.end();
     }

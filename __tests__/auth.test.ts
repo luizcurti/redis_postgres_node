@@ -38,7 +38,9 @@ describe('Auth Middleware', () => {
 
       authentication(req as Request, res as Response, next);
 
-      expect(sign).toHaveBeenCalledWith({ sub: 'userId' }, 'secret_word_here', { expiresIn: '1h' });
+      expect(sign).toHaveBeenCalledWith({ sub: 'userId' }, 'secret_word_here', {
+        expiresIn: '1h',
+      });
       expect(verify).toHaveBeenCalledWith('newToken', process.env.JWT_SECRET);
       expect((req as any).userId).toBe('userId123');
       expect(next).toHaveBeenCalled();
@@ -64,7 +66,9 @@ describe('Auth Middleware', () => {
 
     it('should handle JWT verification failure with proper error message', () => {
       req.headers = { authorization: 'Bearer invalid.token.here' };
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleErrorSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
 
       jest.mocked(verify).mockImplementation(() => {
         throw new Error('Token verification failed');
@@ -103,14 +107,16 @@ describe('Auth Middleware', () => {
 
     it('should handle JWT verification failure with proper error message', () => {
       req.headers = { authorization: 'Bearer invalid.token.here' };
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleErrorSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
 
       jest.mocked(verify).mockImplementation(() => {
         throw new Error('Token verification failed');
       });
 
       authMiddleware(req as Request, res as Response, next);
-      
+
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith({ error: 'Invalid token' });
       expect(next).not.toHaveBeenCalled();

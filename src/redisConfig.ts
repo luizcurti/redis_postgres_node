@@ -1,4 +1,4 @@
-import Redis from "ioredis";
+import Redis from 'ioredis';
 
 const redisClient = new Redis();
 
@@ -7,7 +7,7 @@ async function getRedis(value: string) {
 }
 
 async function setRedis(key: string, value: string, expiration: number = 3600) {
-  return redisClient.set(key, value, 'EX', expiration); 
+  return redisClient.set(key, value, 'EX', expiration);
 }
 
 export { redisClient, getRedis, setRedis };
