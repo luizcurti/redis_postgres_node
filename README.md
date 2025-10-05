@@ -75,10 +75,20 @@ This project uses GitHub Actions for continuous integration. The pipeline automa
 - **Build**: Compiles the project to ensure it builds successfully
 
 The CI pipeline runs on:
-- Push to `main` or `develop` branches
-- Pull requests to `main` or `develop` branches
-- Node.js versions (20.x)
+- Push to `main` branch
+- Pull requests to `main` branch
+- Node.js version (20.x)
 
 ### Services included in CI:
 - PostgreSQL 13 for database tests
 - Redis Alpine for caching tests
+
+## 📋 Important Notes
+
+### Package Lock File
+The project includes a `package-lock.json` to ensure consistent dependency installations in CI/CD environments. This file **must** be committed to the repository.
+
+### Development Dependencies
+Dependencies are organized into:
+- **dependencies**: Packages required in production
+- **devDependencies**: Development tools (ESLint, Prettier, Jest, TypeScript, etc.)

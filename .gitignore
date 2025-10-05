@@ -31,8 +31,9 @@ coverage/
 .DS_Store
 Thumbs.db
 
-# Package manager lock files
-package-lock.json
+
+# Package manager lock files (keep package-lock.json for CI/CD)
+# package-lock.json
 
 # TypeScript cache
 *.tsbuildinfo
