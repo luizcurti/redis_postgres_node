@@ -2,7 +2,7 @@ import { LoginUserController } from '../src/controllers/LoginUserController';
 import { Request, Response } from 'express';
 import { createConnection } from '../src/postgres';
 import { setRedis } from '../src/redisConfig';
-import { Pool } from 'pg';
+import { PoolClient } from 'pg';
 import { sign } from 'jsonwebtoken';
 import { compare } from 'bcryptjs';
 
@@ -24,8 +24,8 @@ jest.mock('../src/postgres', () => ({
           },
         ],
       }),
-      end: jest.fn(),
-    } as unknown as Pool)
+      release: jest.fn(),
+    } as unknown as PoolClient)
   ),
 }));
 
@@ -69,11 +69,12 @@ describe('LoginUserController', () => {
   it('should return 404 if user is not found', async () => {
     req = { body: { username: 'nonexistent', password: 'testpass' } };
     const mockQuery = jest.fn().mockResolvedValueOnce({ rows: [] });
-    jest
-      .mocked(createConnection)
-      .mockReturnValueOnce(
-        Promise.resolve({ query: mockQuery, end: jest.fn() } as unknown as Pool)
-      );
+    jest.mocked(createConnection).mockReturnValueOnce(
+      Promise.resolve({
+        query: mockQuery,
+        release: jest.fn(),
+      } as unknown as PoolClient)
+    );
 
     await controller.handle(req as Request, res as Response);
 
@@ -130,11 +131,12 @@ describe('LoginUserController', () => {
     const mockQuery = jest
       .fn()
       .mockRejectedValueOnce(new Error('Database error'));
-    jest
-      .mocked(createConnection)
-      .mockReturnValueOnce(
-        Promise.resolve({ query: mockQuery, end: jest.fn() } as unknown as Pool)
-      );
+    jest.mocked(createConnection).mockReturnValueOnce(
+      Promise.resolve({
+        query: mockQuery,
+        release: jest.fn(),
+      } as unknown as PoolClient)
+    );
 
     await controller.handle(req as Request, res as Response);
 

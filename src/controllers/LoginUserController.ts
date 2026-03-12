@@ -42,8 +42,6 @@ export class LoginUserController {
         return response.status(401).json({ error: 'Invalid credentials.' });
       }
 
-      delete user.password;
-
       const token = sign({}, process.env.JWT_SECRET as string, {
         subject: user.id,
         expiresIn: '1h',
@@ -66,7 +64,7 @@ export class LoginUserController {
     } catch {
       return response.status(500).json({ error: 'Internal server error.' });
     } finally {
-      await clientConnection.end();
+      clientConnection.release();
     }
   }
 }

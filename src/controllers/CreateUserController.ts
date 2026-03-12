@@ -37,7 +37,7 @@ export class CreateUserController {
     } catch {
       return response.status(500).json({ error: 'Internal server error' });
     } finally {
-      await clientConnection.end();
+      clientConnection.release();
     }
   }
 }

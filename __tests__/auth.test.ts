@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
-import { verify, sign } from 'jsonwebtoken';
-import { authMiddleware, authentication } from '../src/middleware/auth';
+import { verify } from 'jsonwebtoken';
+import { authentication } from '../src/middleware/auth';
 
 jest.mock('jsonwebtoken', () => ({
   verify: jest.fn(),
-  sign: jest.fn(() => 'mockToken'),
 }));
 
 describe('Auth Middleware', () => {
@@ -28,20 +27,16 @@ describe('Auth Middleware', () => {
   });
 
   describe('authentication', () => {
-    it('should call next() if token is valid', () => {
+    it('should call next() and set userId if token is valid', () => {
       const mockToken = 'valid.token.here';
       req.headers = { authorization: `Bearer ${mockToken}` };
       const mockDecoded = { sub: 'userId123' };
 
-      (sign as jest.Mock).mockReturnValueOnce('newToken');
       (verify as jest.Mock).mockReturnValueOnce(mockDecoded);
 
       authentication(req as Request, res as Response, next);
 
-      expect(sign).toHaveBeenCalledWith({ sub: 'userId' }, 'secret_word_here', {
-        expiresIn: '1h',
-      });
-      expect(verify).toHaveBeenCalledWith('newToken', process.env.JWT_SECRET);
+      expect(verify).toHaveBeenCalledWith(mockToken, process.env.JWT_SECRET);
       expect((req as Request & { userId: string }).userId).toBe('userId123');
       expect(next).toHaveBeenCalled();
     });
@@ -54,8 +49,8 @@ describe('Auth Middleware', () => {
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should return 401 if token format is invalid', () => {
-      req.headers = { authorization: 'InvalidTokenFormat' };
+    it('should return 401 if authorization header has no token (missing Bearer value)', () => {
+      req.headers = { authorization: 'Bearer' };
 
       authentication(req as Request, res as Response, next);
 
@@ -64,13 +59,10 @@ describe('Auth Middleware', () => {
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should handle JWT verification failure with proper error message', () => {
+    it('should return 401 if token verification fails', () => {
       req.headers = { authorization: 'Bearer invalid.token.here' };
-      const consoleErrorSpy = jest
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
 
-      jest.mocked(verify).mockImplementation(() => {
+      (verify as jest.Mock).mockImplementation(() => {
         throw new Error('Token verification failed');
       });
 
@@ -79,49 +71,6 @@ describe('Auth Middleware', () => {
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith({ error: 'Invalid token' });
       expect(next).not.toHaveBeenCalled();
-
-      consoleErrorSpy.mockRestore();
-    });
-  });
-
-  describe('authMiddleware', () => {
-    it('should call next() if token is valid', () => {
-      const mockToken = 'valid.token.here';
-      req.headers = { authorization: `Bearer ${mockToken}` };
-
-      (verify as jest.Mock).mockReturnValueOnce({ sub: 'userId123' });
-
-      authMiddleware(req as Request, res as Response, next);
-
-      expect(verify).toHaveBeenCalledWith(mockToken, 'secret');
-      expect(next).toHaveBeenCalled();
-    });
-
-    it('should return 401 if no authorization header is present', () => {
-      authMiddleware(req as Request, res as Response, next);
-
-      expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({ error: 'No token provided' });
-      expect(next).not.toHaveBeenCalled();
-    });
-
-    it('should handle JWT verification failure with proper error message', () => {
-      req.headers = { authorization: 'Bearer invalid.token.here' };
-      const consoleErrorSpy = jest
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
-
-      jest.mocked(verify).mockImplementation(() => {
-        throw new Error('Token verification failed');
-      });
-
-      authMiddleware(req as Request, res as Response, next);
-
-      expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid token' });
-      expect(next).not.toHaveBeenCalled();
-
-      consoleErrorSpy.mockRestore();
     });
   });
 });

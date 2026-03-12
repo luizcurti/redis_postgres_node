@@ -5,7 +5,7 @@ import { createConnection } from '../src/postgres';
 jest.mock('../src/postgres', () => ({
   createConnection: jest.fn(() => ({
     query: jest.fn(),
-    end: jest.fn(),
+    release: jest.fn(),
   })),
 }));
 
@@ -23,7 +23,7 @@ describe('CreateUserController', () => {
   let controller: CreateUserController;
   let mockConnection: {
     query: jest.Mock;
-    end: jest.Mock;
+    release: jest.Mock;
   };
 
   beforeEach(() => {
@@ -35,7 +35,7 @@ describe('CreateUserController', () => {
     controller = new CreateUserController();
     mockConnection = {
       query: jest.fn(),
-      end: jest.fn(),
+      release: jest.fn(),
     };
     (createConnection as jest.Mock).mockResolvedValue(mockConnection);
   });

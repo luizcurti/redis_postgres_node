@@ -44,7 +44,7 @@ describe('Routes Endpoints', () => {
   beforeEach(() => {
     mockPool = {
       query: jest.fn(),
-      end: jest.fn(),
+      release: jest.fn(),
     };
 
     const loginQueryMock = jest.fn(sql => {
