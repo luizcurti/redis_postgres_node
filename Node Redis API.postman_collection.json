@@ -6,7 +6,38 @@
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "43702418"
 	},
+	"variable": [
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		}
+	],
 	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
 		{
 			"name": "Create User",
 			"request": {
@@ -37,6 +68,23 @@
 		},
 		{
 			"name": "Login User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const res = pm.response.json();",
+							"if (res.token) {",
+							"    pm.collectionVariables.set('token', res.token);",
+							"}",
+							"if (res.user && res.user.id) {",
+							"    pm.collectionVariables.set('userId', res.user.id);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -67,61 +115,19 @@
 			"name": "Get User Profile",
 			"request": {
 				"auth": {
-					"type": "jwt",
-					"jwt": [
+					"type": "bearer",
+					"bearer": [
 						{
-							"key": "addTokenTo",
-							"value": "header",
-							"type": "string"
-						},
-						{
-							"key": "isSecretBase64Encoded",
-							"value": false,
-							"type": "boolean"
-						},
-						{
-							"key": "secret",
-							"value": "SECRET",
-							"type": "string"
-						},
-						{
-							"key": "algorithm",
-							"value": "HS256",
-							"type": "string"
-						},
-						{
-							"key": "payload",
-							"value": "{}",
-							"type": "string"
-						},
-						{
-							"key": "headerPrefix",
-							"value": "Bearer",
-							"type": "string"
-						},
-						{
-							"key": "queryParamKey",
-							"value": "token",
-							"type": "string"
-						},
-						{
-							"key": "header",
-							"value": "{}",
+							"key": "token",
+							"value": "{{token}}",
 							"type": "string"
 						}
 					]
 				},
 				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "",
-						"type": "text",
-						"disabled": true
-					}
-				],
+				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/users/profile/:id",
+					"raw": "http://localhost:3000/users/profile/{{userId}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -130,13 +136,7 @@
 					"path": [
 						"users",
 						"profile",
-						":id"
-					],
-					"variable": [
-						{
-							"key": "id",
-							"value": ""
-						}
+						"{{userId}}"
 					]
 				}
 			},
